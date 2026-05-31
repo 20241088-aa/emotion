@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>감정의 조각들</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600&family=Noto+Serif+KR:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="bg" aria-hidden="true">
+      <div class="blob blob-a"></div>
+      <div class="blob blob-b"></div>
+      <div class="grid-glow"></div>
+    </div>
+
+    <main class="shell">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">컬러 테라피 퍼즐</p>
+          <h1>감정의 조각들</h1>
+          <p class="subtitle">
+            부드러운 그라데이션의 연결점만으로 정답을 찾는 힐링 퍼즐.
+          </p>
+        </div>
+        <div class="hero-card">
+          <p class="card-title">완성 조건</p>
+          <p class="card-body">
+            타일의 그라데이션이 서로 연결되거나 여백이 최소화된 흐름이 되도록
+            맞추면 클리어됩니다.
+          </p>
+        </div>
+      </header>
+
+      <section id="home" class="home">
+        <button id="homeTap" class="home-tap">화면을 눌러 시작</button>
+        <div class="home-card">
+          <p class="panel-title">오늘의 감정 퍼즐</p>
+          <p class="panel-body">부드러운 색의 결을 따라 감정의 조각을 맞춰보세요.</p>
+        </div>
+      </section>
+
+      <section id="modeArea" class="mode-area is-hidden">
+        <div class="panel">
+          <p class="panel-title">퍼즐 선택</p>
+          <p class="panel-body">원하는 퍼즐을 고르면 스테이지가 열립니다.</p>
+          <div class="mode-grid" role="list">
+            <button class="mode-card is-active" data-mode="slide">
+              <p>슬라이딩 퍼즐</p>
+              <span>빈 칸으로 타일을 밀어 넣기</span>
+            </button>
+            <button class="mode-card" data-mode="drag">
+              <p>드래그 앤 드롭</p>
+              <span>타일을 서로 교환하기</span>
+            </button>
+            <button class="mode-card" data-mode="rotate">
+              <p>타일 회전</p>
+              <span>타일 방향을 맞춰 흐름 연결</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section id="stageArea" class="stage-area is-hidden">
+        <div class="lobby-grid">
+          <div class="panel">
+            <div class="stage-head">
+              <p class="panel-title">스테이지</p>
+              <button id="modeBackBtn" class="ghost">퍼즐 다시 선택</button>
+            </div>
+            <div class="stage-list" role="list">
+              <button class="stage-button is-active" data-stage="1">1</button>
+              <button class="stage-button" data-stage="2">2</button>
+              <button class="stage-button" data-stage="3">3</button>
+              <button class="stage-button" data-stage="4">4</button>
+              <button class="stage-button" data-stage="5">5</button>
+            </div>
+            <p id="stageDesc" class="panel-body"></p>
+          </div>
+          <div class="panel">
+            <p class="panel-title">색상 선택</p>
+            <div class="lobby-controls">
+              <label class="control">
+                <span>컬러 팔레트</span>
+                <select id="paletteSelect" aria-label="Palette">
+                  <option value="dawn">새벽 안개</option>
+                  <option value="breeze">라벤더 바람</option>
+                  <option value="meadow">초원 빛</option>
+                </select>
+              </label>
+              <p class="panel-body">스테이지를 눌러 시작하세요.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="gameArea" class="game-area is-hidden">
+        <section class="toolbar">
+          <div class="status">
+            <div>
+              <p class="status-label">선택한 퍼즐</p>
+              <p id="statusText" class="status-value"></p>
+            </div>
+            <div>
+              <p class="status-label">완성 조건</p>
+              <p class="status-value">그라데이션 연결점이 끊기지 않게</p>
+            </div>
+          </div>
+          <div class="controls">
+            <div class="buttons">
+              <button id="hintBtn" class="ghost">감정의 등불</button>
+              <button id="stageBackBtn" class="ghost">스테이지</button>
+              <button id="newBtn" class="primary">새 퍼즐</button>
+              <button id="resetBtn" class="ghost">초기화</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="game">
+          <div class="board-wrap">
+            <div id="board" class="board" aria-live="polite"></div>
+            <div id="completion" class="completion" aria-hidden="true">
+              <p>연결 완료</p>
+              <span>천천히 숨을 고르세요.</span>
+            </div>
+          </div>
+          <aside class="side">
+            <div class="panel">
+              <p class="panel-title">모드 안내</p>
+              <p id="modeHint" class="panel-body"></p>
+            </div>
+            <div class="panel">
+              <p class="panel-title">연결률</p>
+              <div class="progress">
+                <div class="progress-bar" id="progressBar"></div>
+              </div>
+              <p id="progressText" class="panel-body">연결 0%</p>
+            </div>
+          </aside>
+        </section>
+
+        <div id="hintOverlay" class="hint-overlay is-hidden" role="dialog" aria-modal="true">
+          <div class="hint-card">
+            <div class="hint-header">
+              <span class="hint-handle" aria-hidden="true"></span>
+              <span class="hint-wing left" aria-hidden="true"></span>
+              <span class="hint-orb" aria-hidden="true"></span>
+              <span class="hint-wing right" aria-hidden="true"></span>
+            </div>
+            <p class="hint-title">감정의 등불</p>
+            <p class="hint-body">완성된 그라데이션의 흐름을 잠시 비춰줍니다.</p>
+            <div class="hint-image" id="hintImage" aria-hidden="true"></div>
+            <button id="hintClose" class="ghost">닫기</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
