@@ -11,11 +11,12 @@ const resetBtn = document.getElementById("resetBtn");
 const hintBtn = document.getElementById("hintBtn");
 const hintOverlay = document.getElementById("hintOverlay");
 const hintImage = document.getElementById("hintImage");
-const hintClose = document.getElementById("hintClose");
 const modeHint = document.getElementById("modeHint");
 const progressBar = document.getElementById("progressBar");
 const progressText = document.getElementById("progressText");
 const completion = document.getElementById("completion");
+const nextStageBtn = document.getElementById("nextStageBtn");
+const lobbyBtn = document.getElementById("lobbyBtn");
 const stageDesc = document.getElementById("stageDesc");
 const statusText = document.getElementById("statusText");
 const gameArea = document.getElementById("gameArea");
@@ -51,9 +52,9 @@ const palettes = {
 };
 
 const modeHints = {
-  slide: "빈 칸으로 타일을 이동해 그라데이션의 흐름을 이어주세요.",
-  drag: "타일을 서로 교환해 그라데이션 연결점을 맞춰주세요.",
-  rotate: "타일을 회전해 색의 흐름이 끊기지 않게 맞춰주세요.",
+  slide: "여백을 순환시키며 그라데이션의 흐름을 이어주세요.",
+  drag: "흐름을 직면하고 타일을 재배치해 연결점을 맞춰주세요.",
+  rotate: "관점을 전환해 색의 흐름이 끊기지 않게 맞춰주세요.",
 };
 
 const stages = [
@@ -103,6 +104,7 @@ let paletteKey = "dawn";
 let stageId = 1;
 let gradientUrl = "";
 let stageCleared = false;
+let completionTimeout = null;
 
 const storageKey = "emotion-shards-progress";
 
@@ -355,10 +357,26 @@ const render = () => {
   updateProgress();
 };
 
-const setCompletion = (isComplete) => {
-  completion.classList.toggle("is-visible", isComplete);
-  completion.setAttribute("aria-hidden", String(!isComplete));
+const showCompletionOverlay = (show) => {
+  completion.classList.toggle("is-visible", show);
+  completion.setAttribute("aria-hidden", String(!show));
+  nextStageBtn.disabled = stageId >= stages.length;
+};
+
+const setBoardComplete = (isComplete) => {
   board.classList.toggle("is-complete", isComplete);
+};
+
+const fillSlidingEmptyTile = () => {
+  if (mode !== "slide" || emptyIndex === null) return;
+  const emptyTile = board.querySelector(".tile.empty");
+  if (!emptyTile) return;
+  const row = Math.floor(emptyIndex / size);
+  const col = emptyIndex % size;
+  emptyTile.classList.add("filled");
+  emptyTile.style.backgroundImage = `url(${gradientUrl})`;
+  emptyTile.style.backgroundSize = `${size * 100}% ${size * 100}%`;
+  emptyTile.style.backgroundPosition = `${(col / (size - 1)) * 100}% ${(row / (size - 1)) * 100}%`;
 };
 
 const updateProgress = () => {
@@ -378,9 +396,29 @@ const updateProgress = () => {
   const percent = Math.round((correct / total) * 100);
   progressBar.style.width = `${percent}%`;
   progressText.textContent = `연결 ${percent}%`;
-  setCompletion(percent === 100);
+  if (percent < 100) {
+    showCompletionOverlay(false);
+    setBoardComplete(false);
+    if (completionTimeout) {
+      clearTimeout(completionTimeout);
+      completionTimeout = null;
+    }
+    const emptyTile = board.querySelector(".tile.empty");
+    if (emptyTile) {
+      emptyTile.classList.remove("filled");
+      emptyTile.style.backgroundImage = "";
+    }
+  }
   if (percent === 100 && !stageCleared) {
     stageCleared = true;
+    setBoardComplete(true);
+    fillSlidingEmptyTile();
+    if (completionTimeout) {
+      clearTimeout(completionTimeout);
+    }
+    completionTimeout = setTimeout(() => {
+      showCompletionOverlay(true);
+    }, 520);
     if (stageId < stages.length) {
       setUnlockedStage(stageId + 1);
     }
@@ -448,11 +486,16 @@ const buildMode = () => {
   });
   initialState = JSON.parse(JSON.stringify(state));
   stageCleared = false;
+  showCompletionOverlay(false);
+  setBoardComplete(false);
+  if (completionTimeout) {
+    clearTimeout(completionTimeout);
+    completionTimeout = null;
+  }
   modeHint.textContent = modeHints[mode];
   gradientUrl = buildGradientImage();
   hintImage.style.backgroundImage = `url(${gradientUrl})`;
   hintOverlay.classList.add("is-hidden");
-  setCompletion(false);
   render();
 };
 
@@ -462,7 +505,12 @@ const resetMode = () => {
     emptyIndex = tiles.findIndex((tile) => tile === null);
   }
   stageCleared = false;
-  setCompletion(false);
+  showCompletionOverlay(false);
+  setBoardComplete(false);
+  if (completionTimeout) {
+    clearTimeout(completionTimeout);
+    completionTimeout = null;
+  }
   render();
 };
 
@@ -494,9 +542,9 @@ const setStage = (nextStage) => {
 };
 
 const getModeLabel = (value) => {
-  if (value === "slide") return "슬라이딩 퍼즐";
-  if (value === "drag") return "드래그 앤 드롭";
-  return "타일 회전";
+  if (value === "slide") return "여백과 순환";
+  if (value === "drag") return "직면과 재배치";
+  return "관점의 전환";
 };
 
 const startGame = () => {
@@ -559,9 +607,17 @@ homeTap.addEventListener("click", showModeSelect);
 modeBackBtn.addEventListener("click", showModeSelect);
 stageBackBtn.addEventListener("click", goBackToStage);
 hintBtn.addEventListener("click", () => toggleHint(true));
-hintClose.addEventListener("click", () => toggleHint(false));
 hintOverlay.addEventListener("click", (event) => {
   if (event.target === hintOverlay) toggleHint(false);
+});
+nextStageBtn.addEventListener("click", () => {
+  if (stageId < stages.length) {
+    setStage(stageId + 1);
+    startGame();
+  }
+});
+lobbyBtn.addEventListener("click", () => {
+  showStageSelect();
 });
 
 Array.from(document.querySelectorAll(".mode-card")).forEach((card) => {

@@ -51,16 +51,16 @@
           <p class="panel-body">원하는 퍼즐을 고르면 스테이지가 열립니다.</p>
           <div class="mode-grid" role="list">
             <button class="mode-card is-active" data-mode="slide">
-              <p>슬라이딩 퍼즐</p>
-              <span>빈 칸으로 타일을 밀어 넣기</span>
+              <p>여백과 순환</p>
+              <span>빈 칸으로 흐름을 정리하는 퍼즐</span>
             </button>
             <button class="mode-card" data-mode="drag">
-              <p>드래그 앤 드롭</p>
-              <span>타일을 서로 교환하기</span>
+              <p>직면과 재배치</p>
+              <span>타일을 맞바꾸며 흐름 재배치</span>
             </button>
             <button class="mode-card" data-mode="rotate">
-              <p>타일 회전</p>
-              <span>타일 방향을 맞춰 흐름 연결</span>
+              <p>관점의 전환</p>
+              <span>타일의 방향을 맞춰 흐름 연결</span>
             </button>
           </div>
         </div>
@@ -111,9 +111,15 @@
               <p class="status-value">그라데이션 연결점이 끊기지 않게</p>
             </div>
           </div>
+          <div class="progress-inline">
+            <p class="status-label">연결률</p>
+            <div class="progress">
+              <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <p id="progressText" class="status-value">연결 0%</p>
+          </div>
           <div class="controls">
             <div class="buttons">
-              <button id="hintBtn" class="ghost">감정의 등불</button>
               <button id="stageBackBtn" class="ghost">스테이지</button>
               <button id="newBtn" class="primary">새 퍼즐</button>
               <button id="resetBtn" class="ghost">초기화</button>
@@ -127,6 +133,10 @@
             <div id="completion" class="completion" aria-hidden="true">
               <p>연결 완료</p>
               <span>천천히 숨을 고르세요.</span>
+              <div class="completion-actions">
+                <button id="nextStageBtn" class="primary">다음 스테이지</button>
+                <button id="lobbyBtn" class="ghost">로비로</button>
+              </div>
             </div>
           </div>
           <aside class="side">
@@ -134,28 +144,16 @@
               <p class="panel-title">모드 안내</p>
               <p id="modeHint" class="panel-body"></p>
             </div>
-            <div class="panel">
-              <p class="panel-title">연결률</p>
-              <div class="progress">
-                <div class="progress-bar" id="progressBar"></div>
-              </div>
-              <p id="progressText" class="panel-body">연결 0%</p>
-            </div>
           </aside>
         </section>
 
+        <button id="hintBtn" class="hint-lantern" aria-label="감정의 등불">
+          <img src="assets/emotion-lantern.png" alt="감정의 등불" />
+        </button>
+
         <div id="hintOverlay" class="hint-overlay is-hidden" role="dialog" aria-modal="true">
           <div class="hint-card">
-            <div class="hint-header">
-              <span class="hint-handle" aria-hidden="true"></span>
-              <span class="hint-wing left" aria-hidden="true"></span>
-              <span class="hint-orb" aria-hidden="true"></span>
-              <span class="hint-wing right" aria-hidden="true"></span>
-            </div>
-            <p class="hint-title">감정의 등불</p>
-            <p class="hint-body">완성된 그라데이션의 흐름을 잠시 비춰줍니다.</p>
             <div class="hint-image" id="hintImage" aria-hidden="true"></div>
-            <button id="hintClose" class="ghost">닫기</button>
           </div>
         </div>
       </section>
